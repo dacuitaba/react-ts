@@ -1,70 +1,77 @@
-const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent');
-import * as path from 'path';
-import * as webpack from 'webpack';
-import 'webpack-dev-server';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
+const getCSSModuleLocalIdent = require("react-dev-utils/getCSSModuleLocalIdent");
+import * as path from "path";
+import * as webpack from "webpack";
+import "webpack-dev-server";
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import * as dotenv from "dotenv";
+const ENV = process.env.NODE_ENV || "development";
 
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const isProd = process.env.NODE_ENV === 'production';
+const envs = dotenv.config({
+  path: path.join(__dirname, "..", "env", `.${ENV}`),
+}).parsed;
+console.log("envs", envs);
+
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const isProd = ENV === "production";
 const config: webpack.Configuration = {
   entry: {
-    index: path.join(__dirname, '..', 'src', 'index.tsx'),
+    index: path.join(__dirname, "..", "src", "index.tsx"),
   },
   output: {
-    path: path.join(__dirname, '..', 'dist'),
-    filename: isProd ? '[name].[contenthash:8].js' : '[name].bundle.js',
+    path: path.join(__dirname, "..", "dist"),
+    filename: isProd ? "[name].[contenthash:8].js" : "[name].bundle.js",
     chunkFilename: isProd
-      ? '[name].[contenthash:8].chunk.js'
-      : '[name].chunk.js',
+      ? "[name].[contenthash:8].chunk.js"
+      : "[name].chunk.js",
     clean: true,
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.jsx', '.js', '...'],
+    extensions: [".tsx", ".ts", ".jsx", ".js", "..."],
     alias: {
-      '@': path.join(__dirname, '../src'),
+      "@": path.join(__dirname, "../src"),
     },
-    modules: [path.resolve(__dirname, '../node_modules')],
+    modules: [path.resolve(__dirname, "../node_modules")],
   },
   module: {
     rules: [
       {
         test: /\.(tsx|ts)/,
-        use: 'babel-loader',
+        use: "babel-loader",
       },
       {
         test: /\.css$/,
         use: [
-          isProd ? MiniCssExtractPlugin.loader : 'style-loader',
-          'css-loader',
-          'postcss-loader',
+          isProd ? MiniCssExtractPlugin.loader : "style-loader",
+          "css-loader",
+          "postcss-loader",
         ], // postcss-loader 兼容 ,css-loader提取样式,style-loader 以style标签形式注入页面
       },
       {
         test: /\.less$/,
         exclude: /\.module\.less$/,
         use: [
-          isProd ? MiniCssExtractPlugin.loader : 'style-loader',
-          'css-loader',
-          'postcss-loader',
-          'less-loader',
+          isProd ? MiniCssExtractPlugin.loader : "style-loader",
+          "css-loader",
+          "postcss-loader",
+          "less-loader",
         ],
       },
       {
         test: /\.module\.less$/,
         use: [
-          isProd ? MiniCssExtractPlugin.loader : 'style-loader',
+          isProd ? MiniCssExtractPlugin.loader : "style-loader",
           {
-            loader: 'css-loader',
+            loader: "css-loader",
             options: {
               modules: {
-                mode: 'local',
+                mode: "local",
                 auto: true,
                 getLocalIdent: getCSSModuleLocalIdent,
               },
             },
           },
-          'postcss-loader',
-          'less-loader',
+          "postcss-loader",
+          "less-loader",
         ],
       },
     ],
@@ -73,8 +80,8 @@ const config: webpack.Configuration = {
     splitChunks: {
       cacheGroups: {
         vendor: {
-          chunks: 'all',
-          name: 'vendor',
+          chunks: "all",
+          name: "vendor",
           priority: 1,
           test: /[\\/]node_modules[\\/](react|react-dom|axios)[\\/]/,
           minSize: 0,
@@ -85,8 +92,11 @@ const config: webpack.Configuration = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, '../public/index.html'),
-      chunks: ['index', 'vendor', 'common'],
+      template: path.join(__dirname, "../public/index.html"),
+      chunks: ["index", "vendor", "common"],
+    }),
+    new webpack.DefinePlugin({
+      "process.env": JSON.stringify(envs),
     }),
   ],
 };

@@ -3,7 +3,13 @@ module.exports = {
   env: {
     browser: true,
     node: true,
-    es6: true
+    es6: true,
   },
-  extends: ['prettier']
-}
+  extends: ["prettier"],
+  parser: "@typescript-eslint/parser",
+  plugins: ["import"],
+  parserOptions: {
+    ecmaVersion: 2020,
+    sourceType: "module",
+  },
+};
